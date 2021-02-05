@@ -91,22 +91,6 @@ impl<'a> Widget for TextFragments<'a> {
 
                         offset_x += 1;
                     }
-                    Fragment::Widget(widget) => {
-                        let fragments = widget.fragments();
-                        let total_len = widget.total_fragments_len();
-
-                        let text = Self::new(fragments);
-
-                        let widget_area = Rect {
-                            x: start_x,
-                            y: start_y,
-                            width: area.width.saturating_sub(offset_x),
-                            height: area.height.saturating_sub(offset_y as u16),
-                        };
-
-                        text.render(widget_area, buf);
-                        offset_x += total_len;
-                    }
                 }
             }
 
@@ -121,7 +105,6 @@ pub enum Fragment<'a> {
     AsciiSpan(Span<'a>),
     UnicodeSpan(Span<'a>),
     Char(char, Style),
-    Widget(&'a dyn FragmentedWidget),
 }
 
 impl<'a> Fragment<'a> {
@@ -132,7 +115,6 @@ impl<'a> Fragment<'a> {
             Self::AsciiSpan(span) => acc + span.content.len() as u16,
             Self::UnicodeSpan(span) => acc + span.width() as u16,
             Self::Char(_, _) => acc + 1,
-            Self::Widget(widget) => acc + widget.total_fragments_len(),
         })
     }
 }
@@ -143,25 +125,8 @@ impl<'a> From<(char, Style)> for Fragment<'a> {
     }
 }
 
-impl<'a, W> From<&'a W> for Fragment<'a>
-where
-    W: FragmentedWidget,
-{
-    fn from(widget: &'a W) -> Self {
-        Self::Widget(widget)
-    }
-}
-
 /// Represents a widget that can be rendered as text fragments.
 pub trait FragmentedWidget {
-    /// Returns the combined length of each fragment.
-    #[inline]
-    fn total_fragments_len(&self) -> u16 {
-        self.fragments()
-            .into_iter()
-            .fold(0, |acc, x| acc + Fragment::total_len(x))
-    }
-
     /// Returns a reference to every text fragment.
     ///
     /// The [`text_fragments`] macro can be used in some cases to build the array.
