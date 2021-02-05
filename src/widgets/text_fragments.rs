@@ -7,8 +7,6 @@ use tui::{
     widgets::Widget,
 };
 
-type LineItems<'a> = &'a [Fragment<'a>];
-
 /// Draw fragments of text with different styles across multiple lines.
 ///
 /// This serves as an alternative for `tui::widget::Paragraph`.
@@ -16,13 +14,13 @@ type LineItems<'a> = &'a [Fragment<'a>];
 ///
 /// If you only need to draw a single line of text with one style, consider using [SimpleText][`crate::widgets::simple_text::SimpleText`] instead.
 pub struct TextFragments<'a> {
-    items: &'a [LineItems<'a>],
+    items: &'a [Fragment<'a>],
     alignment: Alignment,
 }
 
 impl<'a> TextFragments<'a> {
     #[inline]
-    pub fn new(items: &'a [LineItems<'a>]) -> Self {
+    pub fn new(items: &'a [Fragment<'a>]) -> Self {
         Self {
             items,
             alignment: Alignment::Left,
@@ -51,13 +49,30 @@ impl<'a> Widget for TextFragments<'a> {
             return;
         }
 
-        'outer: for (offset_y, line_items) in self.items.into_iter().enumerate() {
+        let mut item_offset = 0;
+        let mut offset_y = 0;
+
+        'outer: while item_offset <= self.items.len() {
+            let line_items = {
+                let slice = &self.items[item_offset..];
+
+                let next_line_pos = slice
+                    .iter()
+                    .position(Fragment::is_line)
+                    .unwrap_or(slice.len());
+
+                // Our next item slice needs to be the item after the line fragment
+                item_offset += next_line_pos + 1;
+
+                &slice[..next_line_pos]
+            };
+
             let mut offset_x =
                 alignment_offset(self.alignment, area.width, Fragment::total_len(line_items));
 
-            for item in *line_items {
+            for item in line_items {
                 let start_x = area.x + offset_x;
-                let start_y = area.y + offset_y as u16;
+                let start_y = area.y + offset_y;
                 let len = item.len();
 
                 if !Self::can_draw_at_x(area, start_x + len) {
@@ -65,20 +80,23 @@ impl<'a> Widget for TextFragments<'a> {
                 }
 
                 match item {
-                    Fragment::Span(span, _) => {
-                        buf.set_string(start_x, start_y, &span.content, span.style);
+                    Fragment::Span(Span { content, style }, _) => {
+                        buf.set_string(start_x, start_y, content, *style)
                     }
                     Fragment::Char(ch, style) => {
                         buf.get_mut(start_x, start_y)
                             .set_char(*ch)
                             .set_style(*style);
                     }
+                    Fragment::Line => break,
                 }
 
                 offset_x += len;
             }
 
-            if !Self::can_draw_at_y(area, offset_y as u16) {
+            offset_y += 1;
+
+            if !Self::can_draw_at_y(area, offset_y) {
                 break;
             }
         }
@@ -90,6 +108,7 @@ type UnicodeSupport = bool;
 pub enum Fragment<'a> {
     Span(Span<'a>, UnicodeSupport),
     Char(char, Style),
+    Line,
 }
 
 impl<'a> Fragment<'a> {
@@ -105,13 +124,15 @@ impl<'a> Fragment<'a> {
             Self::Span(span, false) => span.content.len() as u16,
             Self::Span(span, true) => span.width() as u16,
             Self::Char(_, _) => 1,
+            Self::Line => 0,
         }
     }
-}
 
-impl<'a> From<(char, Style)> for Fragment<'a> {
-    fn from((ch, style): (char, Style)) -> Self {
-        Self::Char(ch, style)
+    fn is_line(&self) -> bool {
+        match self {
+            Self::Line => true,
+            _ => false,
+        }
     }
 }
 
@@ -120,5 +141,5 @@ pub trait FragmentedWidget {
     /// Returns a reference to every text fragment.
     ///
     /// The [`text_fragments`] macro can be used in some cases to build the array.
-    fn fragments(&self) -> &[LineItems];
+    fn fragments(&self) -> &[Fragment];
 }
