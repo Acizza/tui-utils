@@ -3,6 +3,7 @@ use tui::{
     buffer::Buffer,
     layout::{Alignment, Rect},
     style::Style,
+    text::Span,
     widgets::Widget,
 };
 
@@ -50,14 +51,14 @@ impl<'a> Widget for TextFragments<'a> {
             let start_x = area.x + offset_x;
 
             match item {
-                Fragment::Text(text, style) => {
-                    let len = text.len() as u16;
+                Fragment::AsciiSpan(span) => {
+                    let len = span.content.len() as u16;
 
                     if !Self::can_draw_at_x(area, start_x + len) {
                         return;
                     }
 
-                    buf.set_string(start_x, area.y, text, *style);
+                    buf.set_string(start_x, area.y, &span.content, span.style);
                     offset_x += len;
                 }
                 Fragment::Char(ch, style) => {
@@ -93,7 +94,7 @@ impl<'a> Widget for TextFragments<'a> {
 }
 
 pub enum Fragment<'a> {
-    Text(&'a str, Style),
+    AsciiSpan(Span<'a>),
     Char(char, Style),
     Widget(&'a dyn FragmentedWidget),
 }
@@ -103,16 +104,10 @@ impl<'a> Fragment<'a> {
     #[inline]
     pub fn total_len(items: &[Self]) -> u16 {
         items.iter().fold(0, |acc, item| match item {
-            Self::Text(text, _) => acc + text.len() as u16,
+            Self::AsciiSpan(span) => acc + span.content.len() as u16,
             Self::Char(_, _) => acc + 1,
             Self::Widget(widget) => acc + widget.total_fragments_len(),
         })
-    }
-}
-
-impl<'a> From<(&'a str, Style)> for Fragment<'a> {
-    fn from((value, style): (&'a str, Style)) -> Self {
-        Self::Text(value, style)
     }
 }
 
@@ -135,7 +130,7 @@ where
 #[doc(hidden)]
 macro_rules! _impl_text_fragment {
     ($base_style:expr, $text:expr => $style:expr) => {
-        ($text, $style).into()
+        Fragment::AsciiSpan(Span::styled($text, $style))
     };
 
     ($base_style:expr, $widget:ident) => {
