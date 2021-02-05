@@ -6,4 +6,4 @@ It is only really useful if you are trying to micro-optimize the rendering time 
 There are currently two widgets provided by this library &mdash; both of which are non-allocating and are fast alternatives to the [tui::widgets::Paragraph](https://docs.rs/tui/0.14.0/tui/widgets/struct.Paragraph.html) widget:
 
 * `SimpleText` - Renders a single line of text with one style.
-* `TextFragments` - Renders a single line of text with multiple styles. Supports nesting via the `FragmentedWidget` trait.
+* `TextFragments` - Renders fragments of text with different styles across multiple lines.
