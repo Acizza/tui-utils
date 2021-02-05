@@ -112,10 +112,40 @@ pub enum Fragment<'a> {
 }
 
 impl<'a> Fragment<'a> {
-    /// Calculate the total length of each given item.
+    /// Calculate the total length of each given item, including between lines.
     #[inline]
-    pub fn total_len(items: &[Self]) -> u16 {
-        items.iter().fold(0, |acc, item| acc + item.len())
+    pub fn total_len<I>(items: I) -> u16
+    where
+        I: IntoIterator<Item = &'a Self>,
+    {
+        items.into_iter().fold(0, |acc, item| acc + item.len())
+    }
+
+    /// Returns an iterator over all of the given items on the current line.
+    #[inline]
+    pub fn line_items<I>(items: I) -> impl Iterator<Item = &'a Fragment<'a>>
+    where
+        I: IntoIterator<Item = &'a Self>,
+    {
+        items.into_iter().take_while(|item| !Self::is_line(item))
+    }
+
+    /// Returns the total length of all items from the given items.
+    #[inline]
+    pub fn line_len<I>(items: I) -> u16
+    where
+        I: IntoIterator<Item = &'a Self>,
+    {
+        Self::total_len(Self::line_items(items))
+    }
+
+    /// Returns the total number of lines in the given items.
+    #[inline]
+    pub fn num_lines<I>(items: I) -> u16
+    where
+        I: IntoIterator<Item = &'a Self>,
+    {
+        items.into_iter().filter(|item| Self::is_line(item)).count() as u16
     }
 
     #[inline]
