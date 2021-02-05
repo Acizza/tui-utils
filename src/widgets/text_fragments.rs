@@ -51,47 +51,31 @@ impl<'a> Widget for TextFragments<'a> {
             return;
         }
 
-        for (offset_y, line_items) in self.items.into_iter().enumerate() {
+        'outer: for (offset_y, line_items) in self.items.into_iter().enumerate() {
             let mut offset_x =
                 alignment_offset(self.alignment, area.width, Fragment::total_len(line_items));
 
             for item in *line_items {
                 let start_x = area.x + offset_x;
                 let start_y = area.y + offset_y as u16;
+                let len = item.len();
+
+                if !Self::can_draw_at_x(area, start_x + len) {
+                    break 'outer;
+                }
 
                 match item {
-                    Fragment::AsciiSpan(span) => {
-                        let len = span.content.len() as u16;
-
-                        if !Self::can_draw_at_x(area, start_x + len) {
-                            return;
-                        }
-
+                    Fragment::Span(span, _) => {
                         buf.set_string(start_x, start_y, &span.content, span.style);
-                        offset_x += len;
-                    }
-                    Fragment::UnicodeSpan(span) => {
-                        let len = span.width() as u16;
-
-                        if !Self::can_draw_at_x(area, start_x + len) {
-                            return;
-                        }
-
-                        buf.set_string(start_x, start_y, &span.content, span.style);
-                        offset_x += len;
                     }
                     Fragment::Char(ch, style) => {
-                        if !Self::can_draw_at_x(area, start_x) {
-                            return;
-                        }
-
                         buf.get_mut(start_x, start_y)
                             .set_char(*ch)
                             .set_style(*style);
-
-                        offset_x += 1;
                     }
                 }
+
+                offset_x += len;
             }
 
             if !Self::can_draw_at_y(area, offset_y as u16) {
@@ -101,9 +85,10 @@ impl<'a> Widget for TextFragments<'a> {
     }
 }
 
+type UnicodeSupport = bool;
+
 pub enum Fragment<'a> {
-    AsciiSpan(Span<'a>),
-    UnicodeSpan(Span<'a>),
+    Span(Span<'a>, UnicodeSupport),
     Char(char, Style),
 }
 
@@ -111,11 +96,16 @@ impl<'a> Fragment<'a> {
     /// Calculate the total length of each given item.
     #[inline]
     pub fn total_len(items: &[Self]) -> u16 {
-        items.iter().fold(0, |acc, item| match item {
-            Self::AsciiSpan(span) => acc + span.content.len() as u16,
-            Self::UnicodeSpan(span) => acc + span.width() as u16,
-            Self::Char(_, _) => acc + 1,
-        })
+        items.iter().fold(0, |acc, item| acc + item.len())
+    }
+
+    #[inline]
+    pub fn len(&self) -> u16 {
+        match self {
+            Self::Span(span, false) => span.content.len() as u16,
+            Self::Span(span, true) => span.width() as u16,
+            Self::Char(_, _) => 1,
+        }
     }
 }
 
