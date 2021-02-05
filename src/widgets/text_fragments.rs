@@ -138,38 +138,6 @@ where
     }
 }
 
-#[macro_export]
-#[doc(hidden)]
-macro_rules! _impl_text_fragment {
-    ($base_style:expr, $text:expr => $style:expr) => {
-        Fragment::AsciiSpan(Span::styled($text, $style))
-    };
-
-    ($base_style:expr, $widget:ident) => {
-        (&$widget).into()
-    };
-
-    ($base_style:expr, $text:expr) => {
-        ($text, $base_style).into()
-    };
-}
-
-/// Construct an array of text fragments for use with [TextFragments].
-///
-/// The first argument should be the default style to apply to each fragment.
-/// The rest should be a comma separated list of each fragment.
-///
-/// You can override the style of a text / char element by adding `=>` with the desired
-/// style before the trailing comma.
-#[macro_export]
-macro_rules! text_fragments {
-    ($base_style:expr, $($token:tt),+) => {
-        [
-            $(crate::_impl_text_fragment!($base_style, $token)),+
-        ]
-    };
-}
-
 /// Represents a widget that can be rendered as text fragments.
 pub trait FragmentedWidget {
     /// Returns the combined length of each fragment.
