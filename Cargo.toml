@@ -4,5 +4,6 @@ version = "0.2.0"
 authors = ["Acizza <jgit@tuta.io>"]
 edition = "2018"
 
-[dependencies]
-tui = "0.14"
+[dependencies.tui]
+version = "0.14"
+default-features = false
