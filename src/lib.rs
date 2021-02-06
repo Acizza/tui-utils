@@ -43,3 +43,16 @@ where
         }
     }
 }
+
+/// Returns a calculated grid position.
+///
+/// The `x` and `y` fields on the `dimensions` Rect should be used to indicate the x and y coordinates on the grid.
+#[inline]
+pub fn grid_pos(dimensions: Rect, container: Rect) -> Rect {
+    Rect {
+        x: container.x + (dimensions.width * dimensions.x),
+        y: container.y + (dimensions.height * dimensions.y),
+        width: dimensions.width,
+        height: dimensions.height,
+    }
+}
