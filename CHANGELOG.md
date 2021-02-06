@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 - February 5th, 2021
+
+### Fixes
+
+* Disabled default features from the `tui` crate. This prevents termion from becoming a dependency.
+
 ## 0.2.0 - February 5th, 2021
 
 ### Breaking Changes
