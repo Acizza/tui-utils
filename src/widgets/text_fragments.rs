@@ -105,6 +105,7 @@ impl<'a> Widget for TextFragments<'a> {
 
 type UnicodeSupport = bool;
 
+#[derive(Debug, Clone)]
 pub enum Fragment<'a> {
     Span(Span<'a>, UnicodeSupport),
     Char(char, Style),
