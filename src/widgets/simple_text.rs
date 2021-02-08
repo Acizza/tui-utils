@@ -9,7 +9,7 @@ use tui::{
 
 /// This widget provides a fast way to draw a single line of text with a fixed style.
 ///
-/// More complicated text can be drawn with the [TextFragments][`crate::widgets::text_fragments::TextFragments`] widget.
+/// More complicated text can be drawn with the [`TextFragments`][`crate::widgets::text_fragments::TextFragments`] widget.
 pub struct SimpleText<'a> {
     text: Cow<'a, str>,
     alignment: Alignment,
@@ -18,6 +18,7 @@ pub struct SimpleText<'a> {
 
 impl<'a> SimpleText<'a> {
     #[inline]
+    #[must_use]
     pub fn new<S>(text: S) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -30,12 +31,14 @@ impl<'a> SimpleText<'a> {
     }
 
     #[inline(always)]
+    #[allow(clippy::must_use_candidate)]
     pub fn alignment(mut self, alignment: Alignment) -> Self {
         self.alignment = alignment;
         self
     }
 
     #[inline(always)]
+    #[allow(clippy::must_use_candidate)]
     pub fn style(mut self, style: Style) -> Self {
         self.style = style;
         self

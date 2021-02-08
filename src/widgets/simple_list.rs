@@ -21,6 +21,7 @@ where
 {
     /// Create a new [`SimpleList`] with the given item iterator.
     #[inline]
+    #[must_use]
     pub fn new(items: I) -> Self {
         Self {
             items,
@@ -31,6 +32,7 @@ where
 
     /// Set which item index is selected.
     #[inline]
+    #[allow(clippy::must_use_candidate)]
     pub fn select<Idx>(mut self, index: Idx) -> Self
     where
         Idx: Into<Option<u16>>,
@@ -41,6 +43,7 @@ where
 
     /// Set the span to render on the left of the selected list item.
     #[inline]
+    #[allow(clippy::must_use_candidate)]
     pub fn highlight_symbol(mut self, symbol: Span<'a>) -> Self {
         let len = symbol.content.width();
         self.highlight_symbol = Some((symbol, len as u16));
@@ -75,11 +78,9 @@ where
                 break;
             }
 
-            let is_selected = if let Some(selected) = self.selected {
-                i == selected.saturating_sub(y_offset)
-            } else {
-                false
-            };
+            let is_selected = self
+                .selected
+                .map_or(false, |selected| i == selected.saturating_sub(y_offset));
 
             let y_pos = area.y + i;
             let max_width = area.width - x_offset;

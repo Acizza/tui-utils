@@ -12,7 +12,7 @@ use tui::{
 /// This serves as an alternative for `tui::widget::Paragraph`.
 /// It is meant to be used for simple text layouts that don't need scrolling.
 ///
-/// If you only need to draw a single line of text with one style, consider using [SimpleText][`crate::widgets::simple_text::SimpleText`] instead.
+/// If you only need to draw a single line of text with one style, consider using [`SimpleText`][`crate::widgets::simple_text::SimpleText`] instead.
 pub struct TextFragments<'a> {
     items: &'a [Fragment<'a>],
     alignment: Alignment,
@@ -20,6 +20,7 @@ pub struct TextFragments<'a> {
 
 impl<'a> TextFragments<'a> {
     #[inline]
+    #[must_use]
     pub fn new(items: &'a [Fragment<'a>]) -> Self {
         Self {
             items,
@@ -28,6 +29,7 @@ impl<'a> TextFragments<'a> {
     }
 
     #[inline(always)]
+    #[allow(clippy::must_use_candidate)]
     pub fn alignment(mut self, alignment: Alignment) -> Self {
         self.alignment = alignment;
         self
@@ -112,9 +114,11 @@ pub enum Fragment<'a> {
     Line,
 }
 
+#[allow(clippy::len_without_is_empty)]
 impl<'a> Fragment<'a> {
     /// Calculate the total length of each given item, including between lines.
     #[inline]
+    #[must_use]
     pub fn total_len<I>(items: I) -> u16
     where
         I: IntoIterator<Item = &'a Self>,
@@ -124,6 +128,7 @@ impl<'a> Fragment<'a> {
 
     /// Returns an iterator over all of the given items on the current line.
     #[inline]
+    #[must_use]
     pub fn line_items<I>(items: I) -> impl Iterator<Item = &'a Fragment<'a>>
     where
         I: IntoIterator<Item = &'a Self>,
@@ -133,6 +138,7 @@ impl<'a> Fragment<'a> {
 
     /// Returns the total length of all items from the given items.
     #[inline]
+    #[must_use]
     pub fn line_len<I>(items: I) -> u16
     where
         I: IntoIterator<Item = &'a Self>,
@@ -142,6 +148,7 @@ impl<'a> Fragment<'a> {
 
     /// Returns the total number of lines in the given items.
     #[inline]
+    #[must_use]
     pub fn num_lines<I>(items: I) -> u16
     where
         I: IntoIterator<Item = &'a Self>,
@@ -150,6 +157,7 @@ impl<'a> Fragment<'a> {
     }
 
     #[inline]
+    #[must_use]
     pub fn len(&self) -> u16 {
         match self {
             Self::Span(span, false) => span.content.len() as u16,
@@ -160,9 +168,6 @@ impl<'a> Fragment<'a> {
     }
 
     fn is_line(&self) -> bool {
-        match self {
-            Self::Line => true,
-            _ => false,
-        }
+        matches!(self, Self::Line)
     }
 }

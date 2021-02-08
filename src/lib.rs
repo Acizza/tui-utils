@@ -14,6 +14,7 @@ use tui::{
 pub mod widgets;
 
 #[inline]
+#[must_use]
 pub fn alignment_offset(alignment: Alignment, total_len: u16, item_len: u16) -> u16 {
     match alignment {
         Alignment::Left => 0,
@@ -23,6 +24,7 @@ pub fn alignment_offset(alignment: Alignment, total_len: u16, item_len: u16) -> 
 }
 
 #[inline]
+#[must_use]
 pub fn pad_rect_horiz(rect: Rect, padding: u16) -> Rect {
     Rect {
         x: rect.x + padding,
@@ -32,6 +34,7 @@ pub fn pad_rect_horiz(rect: Rect, padding: u16) -> Rect {
 }
 
 #[inline]
+#[must_use]
 pub fn pad_rect_left(rect: Rect, padding: u16) -> Rect {
     Rect {
         x: rect.x + padding,
@@ -56,6 +59,7 @@ where
 ///
 /// The `x` and `y` fields on the `dimensions` Rect should be used to indicate the x and y coordinates on the grid.
 #[inline]
+#[must_use]
 pub fn grid_pos(dimensions: Rect, container: Rect) -> Rect {
     Rect {
         x: container.x + (dimensions.width * dimensions.x),
