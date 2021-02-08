@@ -2,7 +2,26 @@
 
 ## To Be Released
 
-* Added `SimpleList` component to render lists with items given via an iterator.
+### Breaking Changes
+
+* The following functions have had the #[must_use] attribute applied to them:
+    * `alignment_offset`
+    * `pad_rect_horiz`
+    * `pad_rect_left`
+    * `fill_area`
+    * `grid_pos`
+    * `widgets::simple_text::SimpleText::new`
+    * `widgets::simple_list::SimpleList::new`
+    * `widgets::text_fragments::TextFragments::new`
+    * `widgets::text_fragments::Fragment::total_len`
+    * `widgets::text_fragments::Fragment::line_items`
+    * `widgets::text_fragments::Fragment::line_len`
+    * `widgets::text_fragments::Fragment::num_lines`
+    * `widgets::text_fragments::Fragment::len`
+
+### Features
+
+* Added `SimpleList` widget to render lists with items given via an iterator.
 
 ## 0.2.1 - February 5th, 2021
 
