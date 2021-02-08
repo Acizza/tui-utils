@@ -1,5 +1,9 @@
 # Changelog
 
+## To Be Released
+
+* Added `SimpleList` component to render lists with items given via an iterator.
+
 ## 0.2.1 - February 5th, 2021
 
 ### Fixes
