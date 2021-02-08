@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+## 0.3.0 - February 8th, 2021
+
 ### Breaking Changes
 
 * The following functions have had the #[must_use] attribute applied to them:
