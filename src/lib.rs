@@ -1,3 +1,11 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::clippy::cast_possible_truncation)]
+#![allow(clippy::inline_always)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::shadow_unrelated)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::cast_sign_loss)]
+
 use tui::{
     buffer::{Buffer, Cell},
     layout::{Alignment, Rect},
