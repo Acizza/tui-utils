@@ -2,6 +2,10 @@
 
 ## To Be Released
 
+### Breaking Changes
+
+* The `Fragment` enum has been moved to the widgets module root.
+
 ## 0.3.0 - February 8th, 2021
 
 ### Breaking Changes
