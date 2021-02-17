@@ -6,6 +6,10 @@
 
 * The `Fragment` enum has been moved to the widgets module root.
 
+### Features
+
+* Added a `Log` widget to render lines of `Fragment` arrays. This is a relatively simply abstraction over the `TextFragments` widget.
+
 ## 0.3.0 - February 8th, 2021
 
 ### Breaking Changes
