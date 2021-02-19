@@ -7,7 +7,6 @@ pub use log::Log;
 pub use simple_list::SimpleList;
 pub use simple_text::SimpleText;
 pub use text_fragments::TextFragments;
-
 use tui::{style::Style, text::Span};
 
 type UnicodeSupport = bool;
@@ -58,7 +57,7 @@ impl<'a> Fragment<'a> {
     where
         I: IntoIterator<Item = &'a Self>,
     {
-        items.into_iter().filter(|item| Self::is_line(item)).count() as u16
+        1 + items.into_iter().filter(|item| Self::is_line(item)).count() as u16
     }
 
     #[inline]

@@ -6,6 +6,8 @@
 
 * The `Fragment` enum has been moved to the widgets module root.
 
+* `Fragment::num_lines` will now always return a value >= 1.
+
 ### Features
 
 * Added a `Log` widget to render lines of `Fragment` arrays. This is a relatively simply abstraction over the `TextFragments` widget.
