@@ -16,10 +16,10 @@ where
     let mut results = SmallVec::new();
     let mut line_length = 0;
 
-    for fragment in fragments.into_iter() {
+    for fragment in fragments {
         match fragment {
             Fragment::Span(span, unicode) => {
-                let wrapped = wrap_span_letters(span, unicode, area_width, &mut line_length);
+                let wrapped = wrap_span_letters(&span, unicode, area_width, &mut line_length);
                 results.extend(wrapped.into_iter());
             }
             fragment => {
@@ -33,7 +33,7 @@ where
 }
 
 fn wrap_span_letters<'a>(
-    span: Span<'a>,
+    span: &Span<'a>,
     unicode: bool,
     area_width: u16,
     line_length: &mut u16,

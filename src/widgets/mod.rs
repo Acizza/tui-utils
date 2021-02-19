@@ -32,7 +32,6 @@ impl<'a> Fragment<'a> {
 
     /// Returns an iterator over all of the given items on the current line.
     #[inline]
-    #[must_use]
     pub fn line_items<I>(items: I) -> impl Iterator<Item = &'a Fragment<'a>>
     where
         I: IntoIterator<Item = &'a Self>,
