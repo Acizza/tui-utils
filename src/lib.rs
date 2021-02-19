@@ -12,6 +12,7 @@ use tui::{
 };
 
 pub mod widgets;
+pub mod wrap;
 
 #[inline]
 #[must_use]

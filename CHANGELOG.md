@@ -12,6 +12,8 @@
 
 * Added a `Log` widget to render lines of `Fragment` arrays. This is a relatively simply abstraction over the `TextFragments` widget.
 
+* Added the ability to letter-wrap `Fragment` arrays with a new `wrap` module. This will allocate if more than 4 fragments are needed.
+
 ## 0.3.0 - February 8th, 2021
 
 ### Breaking Changes

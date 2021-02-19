@@ -5,6 +5,8 @@ authors = ["Acizza <jgit@tuta.io>"]
 edition = "2018"
 
 [dependencies]
+smallvec = "1.6"
+unicode-segmentation = "1.7"
 unicode-width = "0.1"
 
 [dependencies.tui]
