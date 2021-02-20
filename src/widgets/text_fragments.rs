@@ -36,11 +36,11 @@ impl<'a> TextFragments<'a> {
     }
 
     fn can_draw_at_x(area: Rect, x: u16) -> bool {
-        x <= area.right()
+        x <= area.width
     }
 
     fn can_draw_at_y(area: Rect, y: u16) -> bool {
-        y <= area.top()
+        y < area.height
     }
 }
 
@@ -77,7 +77,7 @@ impl<'a> Widget for TextFragments<'a> {
                 let start_y = area.y + offset_y;
                 let len = item.len();
 
-                if !Self::can_draw_at_x(area, start_x + len) {
+                if !Self::can_draw_at_x(area, offset_x + len) {
                     break 'outer;
                 }
 
