@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 - February 20th, 2021
+
+### Fixes
+
+* Fixed off-by-one error in `widgets::wrap::wrap_span_letters`.
+
+* Fixed potential overflow in `widgets::text_fragments::TextFragments::{can_draw_at_x, can_draw_at_y}`.
+
 ## 0.4.0 - February 19th, 2021
 
 ### Breaking Changes
