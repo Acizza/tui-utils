@@ -44,9 +44,10 @@ fn wrap_span_letters<'a>(
     let graphemes = UnicodeSegmentation::grapheme_indices(span.content.as_ref(), true);
 
     for (pos, ch) in graphemes {
-        *line_length += ch.width() as u16;
+        let ch_width = ch.width() as u16;
+        *line_length += ch_width;
 
-        if *line_length < area_width {
+        if *line_length <= area_width {
             continue;
         }
 
@@ -57,7 +58,7 @@ fn wrap_span_letters<'a>(
         results.push(Fragment::Line);
 
         segment_start = pos;
-        *line_length = 0;
+        *line_length = ch_width;
     }
 
     let segment = span.content[segment_start..].to_owned();
