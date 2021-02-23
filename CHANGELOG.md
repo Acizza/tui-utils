@@ -1,5 +1,11 @@
 # Changelog
 
+## To Be Released
+
+### Breaking Changes
+
+* `SimpleText::new()` now accepts any type that can be converted to a `tui::text::Span`. Since `tui::text::Span` also contains the style for the text, `SimpleText::style()` has been removed.
+
 ## 0.4.1 - February 20th, 2021
 
 ### Fixes
