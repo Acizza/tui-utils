@@ -9,11 +9,9 @@ pub use simple_text::SimpleText;
 pub use text_fragments::TextFragments;
 use tui::{style::Style, text::Span};
 
-type UnicodeSupport = bool;
-
 #[derive(Debug, Clone)]
 pub enum Fragment<'a> {
-    Span(Span<'a>, UnicodeSupport),
+    Span(Span<'a>),
     Char(char, Style),
     Line,
 }
@@ -63,8 +61,7 @@ impl<'a> Fragment<'a> {
     #[must_use]
     pub fn len(&self) -> u16 {
         match self {
-            Self::Span(span, false) => span.content.len() as u16,
-            Self::Span(span, true) => span.width() as u16,
+            Self::Span(span) => span.width() as u16,
             Self::Char(_, _) => 1,
             Self::Line => 0,
         }

@@ -82,7 +82,7 @@ impl<'a> Widget for TextFragments<'a> {
                 }
 
                 match item {
-                    Fragment::Span(Span { content, style }, _) => {
+                    Fragment::Span(Span { content, style }) => {
                         buf.set_string(start_x, start_y, content, *style)
                     }
                     Fragment::Char(ch, style) => {

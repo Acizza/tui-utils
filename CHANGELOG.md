@@ -6,6 +6,8 @@
 
 * `SimpleText::new()` now accepts any type that can be converted to a `tui::text::Span`. Since `tui::text::Span` also contains the style for the text, `SimpleText::style()` has been removed.
 
+* `Fragment::Span` no longer takes a boolean indicating whether or not to support unicode characters. This was used to potentially improve performance, but makes no real difference in practice.
+
 ## 0.4.1 - February 20th, 2021
 
 ### Fixes
