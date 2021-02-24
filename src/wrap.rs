@@ -1,4 +1,4 @@
-use crate::widgets::Fragment;
+use crate::widgets::{Fragment, SpanOptions};
 use smallvec::SmallVec;
 use tui::text::Span;
 use unicode_segmentation::UnicodeSegmentation;
@@ -18,8 +18,8 @@ where
 
     for fragment in fragments {
         match fragment {
-            Fragment::Span(span) => {
-                let wrapped = wrap_span_letters(&span, area_width, &mut line_length);
+            Fragment::Span(span, opts) => {
+                let wrapped = wrap_span_letters(&span, opts, area_width, &mut line_length);
                 results.extend(wrapped.into_iter());
             }
             fragment => {
@@ -34,6 +34,7 @@ where
 
 fn wrap_span_letters<'a>(
     span: &Span<'a>,
+    opts: SpanOptions,
     area_width: u16,
     line_length: &mut u16,
 ) -> SmallVec<[Fragment<'a>; 4]> {
@@ -53,7 +54,7 @@ fn wrap_span_letters<'a>(
         let segment_span = Span::styled(span.content[segment_start..pos].to_owned(), span.style);
 
         results.reserve(2);
-        results.push(Fragment::Span(segment_span));
+        results.push(Fragment::Span(segment_span, opts));
         results.push(Fragment::Line);
 
         segment_start = pos;
@@ -69,7 +70,7 @@ fn wrap_span_letters<'a>(
     }
 
     let segment_span = Span::styled(segment, span.style);
-    results.push(Fragment::Span(segment_span));
+    results.push(Fragment::Span(segment_span, opts));
 
     results
 }

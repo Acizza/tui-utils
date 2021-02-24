@@ -1,4 +1,4 @@
-use super::Fragment;
+use super::{Fragment, OverflowMode};
 use crate::alignment_offset;
 use tui::{
     buffer::Buffer,
@@ -77,15 +77,28 @@ impl<'a> Widget for TextFragments<'a> {
                 let start_y = area.y + offset_y;
                 let len = item.len();
 
-                if !Self::can_draw_at_x(area, offset_x + len) {
-                    break 'outer;
-                }
-
                 match item {
-                    Fragment::Span(Span { content, style }) => {
-                        buf.set_string(start_x, start_y, content, *style)
+                    Fragment::Span(Span { content, style }, opts) => {
+                        let max_width = match opts.overflow {
+                            OverflowMode::Hide => {
+                                if !Self::can_draw_at_x(area, offset_x + len) {
+                                    break 'outer;
+                                }
+
+                                len
+                            }
+                            OverflowMode::Truncate => {
+                                area.width.saturating_sub(offset_x.saturating_sub(len))
+                            }
+                        };
+
+                        buf.set_stringn(start_x, start_y, content, max_width as usize, *style);
                     }
                     Fragment::Char(ch, style) => {
+                        if !Self::can_draw_at_x(area, offset_x + len) {
+                            break 'outer;
+                        }
+
                         buf.get_mut(start_x, start_y)
                             .set_char(*ch)
                             .set_style(*style);

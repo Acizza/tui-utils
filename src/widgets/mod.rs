@@ -11,13 +11,21 @@ use tui::{style::Style, text::Span};
 
 #[derive(Debug, Clone)]
 pub enum Fragment<'a> {
-    Span(Span<'a>),
+    Span(Span<'a>, SpanOptions),
     Char(char, Style),
     Line,
 }
 
 #[allow(clippy::len_without_is_empty)]
 impl<'a> Fragment<'a> {
+    #[inline]
+    pub fn span<S>(span: S) -> Self
+    where
+        S: Into<Span<'a>>,
+    {
+        Self::Span(span.into(), SpanOptions::default())
+    }
+
     /// Calculate the total length of each given item, including between lines.
     #[inline]
     #[must_use]
@@ -61,7 +69,7 @@ impl<'a> Fragment<'a> {
     #[must_use]
     pub fn len(&self) -> u16 {
         match self {
-            Self::Span(span) => span.width() as u16,
+            Self::Span(span, _) => span.width() as u16,
             Self::Char(_, _) => 1,
             Self::Line => 0,
         }
@@ -69,5 +77,50 @@ impl<'a> Fragment<'a> {
 
     fn is_line(&self) -> bool {
         matches!(self, Self::Line)
+    }
+}
+
+/// Options for a particular span of text.
+#[derive(Debug, Clone, Copy)]
+pub struct SpanOptions {
+    /// Controls what happens when the span is larger than its render area.
+    pub overflow: OverflowMode,
+}
+
+impl SpanOptions {
+    #[inline]
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    #[inline]
+    #[must_use]
+    pub fn overflow(mut self, overflow: OverflowMode) -> Self {
+        self.overflow = overflow;
+        self
+    }
+}
+
+impl Default for SpanOptions {
+    fn default() -> Self {
+        Self {
+            overflow: OverflowMode::default(),
+        }
+    }
+}
+
+/// An action to perform on a span overflow.
+#[derive(Debug, Clone, Copy)]
+pub enum OverflowMode {
+    /// Don't render the span at all.
+    Hide,
+    /// Render only the visible part of the span.
+    Truncate,
+}
+
+impl Default for OverflowMode {
+    fn default() -> Self {
+        Self::Hide
     }
 }
