@@ -1,6 +1,6 @@
 # Changelog
 
-## To Be Released
+## 0.5.0 - February 23rd, 2021
 
 ### Breaking Changes
 
