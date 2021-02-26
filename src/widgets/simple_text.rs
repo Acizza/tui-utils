@@ -48,6 +48,10 @@ impl<'a> SimpleText<'a> {
 
 impl<'a> Widget for SimpleText<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
+        if area.height == 0 {
+            return;
+        }
+
         let len = self.span.width() as u16;
         let offset = alignment_offset(self.alignment, area.width, len);
 
