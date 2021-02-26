@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 - February 26th, 2021
+
+### Fixes
+
+* Fixed various overflow issues in `TextFragments` widgets &mdash; especially when using `OverflowMode::Truncate`.
+
+* The `SimpleText` widget will no longer render when the given rect's height is zero.
+
 ## 0.5.0 - February 23rd, 2021
 
 ### Breaking Changes
