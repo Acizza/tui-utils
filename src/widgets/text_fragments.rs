@@ -6,6 +6,7 @@ use tui::{
     text::Span,
     widgets::Widget,
 };
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
 /// Draw fragments of text with different styles across multiple lines.
 ///
@@ -54,7 +55,7 @@ impl<'a> Widget for TextFragments<'a> {
         let mut item_offset = 0;
         let mut offset_y = 0;
 
-        'outer: while item_offset <= self.items.len() {
+        while item_offset <= self.items.len() {
             let line_items = {
                 let slice = &self.items[item_offset..];
 
@@ -75,36 +76,36 @@ impl<'a> Widget for TextFragments<'a> {
             for item in line_items {
                 let start_x = area.x + offset_x;
                 let start_y = area.y + offset_y;
-                let len = item.len();
 
-                match item {
+                let len = match item {
                     Fragment::Span(Span { content, style }, opts) => {
-                        let max_width = match opts.overflow {
-                            OverflowMode::Hide => {
-                                if !Self::can_draw_at_x(area, offset_x + len) {
-                                    break 'outer;
-                                }
+                        let len = content.width() as u16;
 
-                                len
-                            }
-                            OverflowMode::Truncate => {
-                                area.width.saturating_sub(offset_x.saturating_sub(len))
-                            }
+                        let max_width = match opts.overflow {
+                            OverflowMode::Hide => len,
+                            OverflowMode::Truncate => area.width.min(len),
                         };
 
+                        if !Self::can_draw_at_x(area, offset_x + max_width) {
+                            break;
+                        }
+
                         buf.set_stringn(start_x, start_y, content, max_width as usize, *style);
+                        len
                     }
                     Fragment::Char(ch, style) => {
-                        if !Self::can_draw_at_x(area, offset_x + len) {
-                            break 'outer;
+                        if !Self::can_draw_at_x(area, offset_x) {
+                            break;
                         }
 
                         buf.get_mut(start_x, start_y)
                             .set_char(*ch)
                             .set_style(*style);
+
+                        ch.width().unwrap_or(0) as u16
                     }
                     Fragment::Line => break,
-                }
+                };
 
                 offset_x += len;
             }
