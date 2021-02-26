@@ -58,7 +58,7 @@ impl<'a> Widget for SimpleText<'a> {
         let max_width = if area.width < len {
             match self.overflow {
                 OverflowMode::Hide => return,
-                OverflowMode::Truncate => area.width.saturating_sub(offset.saturating_sub(len)),
+                OverflowMode::Truncate => area.width.min(len),
             }
         } else {
             len
