@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 - March 1st, 2021
+
+### Features
+
+* Added various utilities to complement the `SimpleList` widget in a new `list` module. These utilities make it easy to use wrapping indices / list selections, and selectable enum variants.
+
 ## 0.5.1 - February 26th, 2021
 
 ### Fixes
