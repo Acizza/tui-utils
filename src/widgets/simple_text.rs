@@ -48,7 +48,7 @@ impl<'a> SimpleText<'a> {
 
 impl<'a> Widget for SimpleText<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        if area.height == 0 {
+        if area.width == 0 || area.height == 0 {
             return;
         }
 
@@ -58,7 +58,7 @@ impl<'a> Widget for SimpleText<'a> {
         let max_width = if area.width < len {
             match self.overflow {
                 OverflowMode::Hide => return,
-                OverflowMode::Truncate => area.width.min(len),
+                OverflowMode::Truncate => area.width,
             }
         } else {
             len
