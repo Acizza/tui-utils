@@ -1,5 +1,19 @@
 # Changelog
 
+## To Be Released
+
+### Features
+
+* Added new `layout` module to compute some simple layouts faster than `tui::layout::Layout` and perform common `tui::layout::Rect` operations via a new `RectExt` trait.
+
+### Breaking Changes
+
+* The `pad_rect_horiz` and `pad_rect_left` functions have been moved to the `layout::RectExt` trait.
+
+### Fixes
+
+* Fixed yet another overflow issue in the `SimpleText` widget.
+
 ## 0.6.0 - March 1st, 2021
 
 ### Features
