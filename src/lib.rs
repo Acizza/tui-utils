@@ -5,12 +5,14 @@
 #![allow(clippy::shadow_unrelated)]
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::cast_sign_loss)]
+#![allow(clippy::module_name_repetitions)]
 
 use tui::{
     buffer::{Buffer, Cell},
     layout::{Alignment, Rect},
 };
 
+pub mod layout;
 pub mod list;
 pub mod widgets;
 pub mod wrap;
@@ -22,26 +24,6 @@ pub fn alignment_offset(alignment: Alignment, total_len: u16, item_len: u16) -> 
         Alignment::Left => 0,
         Alignment::Center => (total_len / 2).saturating_sub(item_len / 2),
         Alignment::Right => total_len.saturating_sub(item_len),
-    }
-}
-
-#[inline]
-#[must_use]
-pub fn pad_rect_horiz(rect: Rect, padding: u16) -> Rect {
-    Rect {
-        x: rect.x + padding,
-        width: rect.width.saturating_sub(padding * 2),
-        ..rect
-    }
-}
-
-#[inline]
-#[must_use]
-pub fn pad_rect_left(rect: Rect, padding: u16) -> Rect {
-    Rect {
-        x: rect.x + padding,
-        width: rect.width.saturating_sub(padding),
-        ..rect
     }
 }
 
