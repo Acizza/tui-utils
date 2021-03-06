@@ -1,5 +1,11 @@
 # Changelog
 
+## To Be Released
+
+### Breaking Changes
+
+* Moved `grid_pos` function to `layout::RectExt` trait.
+
 ## 0.7.0 - March 5th, 2021
 
 ### Features

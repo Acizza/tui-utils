@@ -211,6 +211,11 @@ pub trait RectExt: Sized {
     fn lines_from_top(self, lines: u16) -> Rect;
     /// Returns a rect spanning from the bottom of the given `rect` up to the number of `lines` specified.
     fn lines_from_bottom(self, lines: u16) -> Rect;
+
+    /// Returns a calculated grid position.
+    ///
+    /// The `x` and `y` fields on the `dimensions` Rect should be used to indicate the x and y coordinates on the grid.
+    fn grid_pos(self, dimensions: Rect) -> Rect;
 }
 
 impl RectExt for Rect {
@@ -261,6 +266,15 @@ impl RectExt for Rect {
             y: self.y + max_height,
             height: lines.min(max_height),
             ..self
+        }
+    }
+
+    fn grid_pos(self, dimensions: Rect) -> Self {
+        Self {
+            x: self.x + (dimensions.width * dimensions.x),
+            y: self.y + (dimensions.height * dimensions.y),
+            width: dimensions.width,
+            height: dimensions.height,
         }
     }
 }
