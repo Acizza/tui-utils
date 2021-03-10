@@ -2,6 +2,26 @@
 
 ## To Be Released
 
+### Features
+
+* Added `layout::SimpleLayout::split` function to split layouts from a list of `BasicConstraint`'s, similarly to `tui::layout::Layout::split`. The new `BasicConstraint` enum only supports constraints that are easy & fast to solve for. Each variant is described below:
+    * `Length` - A specific number of characters / lines.
+    * `Percentage` - A percentage ranging from 0 to 100 of the entire given area.
+    * `MinLenGrowthPcnt` - A minimum number of characters / lines that grows by a specified percentage of the entire given area.
+    * `MinLenRemaining` - A minimum number of characters / lines that leaves a specified number of characters / lines left at the end.
+
+    The `MinLenGrowthPcnt` and `MinLenRemaining` constraints are meant to be used only when the remaining constraints total size is well known. For example:
+
+    ```rust
+        [
+            BasicConstraint::MinLenGrowthPcnt(5, 30),
+            BasicConstraint::Percentage(15),
+            BasicConstraint::Percentage(15),
+        ]
+    ```
+
+    In the above example, we know that the constraints following `MinLenGrowthPcnt` total 30%, so we should use that as our growth percentage. If you use a growth percentage that doesn't line up exactly with the amount of the space the remaining constraints use up, you may get odd results. Therefore, it is recommended to only use `Percentage` constraints following `MinLenGrowthPcnt`, and `Length` constraints following `MinLenRemaining`. Manually specifying the amount of space left avoids the use of a cassowary solver.
+
 ### Breaking Changes
 
 * Moved `grid_pos` function to `layout::RectExt` trait.

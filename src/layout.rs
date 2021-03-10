@@ -1,3 +1,4 @@
+use smallvec::SmallVec;
 use tui::layout::{Direction, Rect};
 
 /// Build simple layouts much faster than [`tui::layout::Layout`](https://docs.rs/tui/0.14.0/tui/layout/struct.Layout.html) and without ever allocating.
@@ -119,6 +120,42 @@ impl SimpleLayout {
             bottom_right: half_size_rect(area.x + half_width, area.y + half_height),
         }
     }
+
+    /// Split the given `area` by the given list of [`BasicConstraint`]'s.
+    ///
+    /// This is a fast alternative to [`tui::layout::Layout::split`](https://docs.rs/tui/0.14.0/tui/layout/struct.Layout.html#method.split).
+    #[inline]
+    #[must_use]
+    pub fn split(self, area: Rect, constraints: &[BasicConstraint]) -> SmallVec<[Rect; 4]> {
+        let area = self.get_padded(area);
+        let gen_rect = GenericRect::from_dir(&self.direction, area);
+
+        let mut results = SmallVec::with_capacity(constraints.len());
+        let mut offset = 0;
+
+        for &constraint in constraints {
+            let size = match constraint {
+                BasicConstraint::Length(len) => len,
+                BasicConstraint::Percentage(pcnt) => fast_rounded_percentage(gen_rect.size, pcnt),
+                BasicConstraint::MinLenGrowthPcnt(min, pcnt) => {
+                    let value = fast_rounded_percentage(gen_rect.size, pcnt);
+                    value.max(min)
+                }
+                BasicConstraint::MinLenRemaining(min, remaining) => {
+                    min.max(gen_rect.size.saturating_sub(offset + remaining))
+                }
+            };
+
+            let max_size = size.min(gen_rect.size - offset);
+
+            let rect = GenericRect::new(gen_rect.pos + offset, max_size);
+            results.push(rect.as_rect(&self.direction, area));
+
+            offset += max_size;
+        }
+
+        results
+    }
 }
 
 impl Default for SimpleLayout {
@@ -171,6 +208,53 @@ impl GenericRect {
             ..area
         }
     }
+}
+
+pub type Length = u16;
+pub type RemainingLength = Length;
+pub type Percentage = u16;
+
+/// Area constraints that are easy to calculate.
+///
+/// This is similar to [`tui::layout::Constraint`](https://docs.rs/tui/0.14.0/tui/layout/enum.Constraint.html), but only
+/// supports units that are easy to solve for.
+///
+/// The [`MinLenGrowthPcnt`] and [`MinLenRemaining`] constraints are meant to be used only when the remaining constraints total size is well known.
+/// For example:
+///
+/// ```notest
+/// [
+///     Self::MinLenGrowthPcnt(5, 30),
+///     Self::Percentage(15),
+///     Self::Percentage(15),
+/// ]
+/// ```
+///
+/// In the above example, we know that the constraints following [`MinLenGrowthPcnt`] total 30%, so we should use that as our growth percentage.
+/// If you use a growth percentage that doesn't line up exactly with the amount of the space the remaining constraints use up, you may get odd results.
+/// Therefore, it is recommended to only use [`Percentage`] constraints following [`MinLenGrowthPcnt`], and [`Length`] constraints following [`MinLenRemaining`].
+/// Manually specifying the amount of space left avoids the use of a cassowary solver.
+///
+/// [`Length`]: `Self::Length`
+/// [`Percentage`]: `Self::Percentage`
+/// [`MinLenGrowthPcnt`]: `Self::MinLenGrowthPcnt`
+/// [`MinLenRemaining`]: `Self::MinLenRemaining`
+#[derive(Clone, Copy)]
+pub enum BasicConstraint {
+    /// Number of characters / lines.
+    Length(Length),
+    /// Percentage of the entire area from 0 - 100.
+    Percentage(Percentage),
+    /// A minimum length that is expanded by the given percentage from 0 - 100.
+    ///
+    /// This can be used as a substitute for [`tui::layout::Constraint::Min`](https://docs.rs/tui/0.14.0/tui/layout/enum.Constraint.html#variant.Min)
+    /// in simple layouts. It is only recommended to use this constraint in cases where all subsequent constraints are [`Percentage`](`Self::Percentage`)'s.
+    MinLenGrowthPcnt(Length, Percentage),
+    /// A minimum length that expands up to a specified `RemainingLength`.
+    ///
+    /// This can be used as a substitute for [`tui::layout::Constraint::Min`](https://docs.rs/tui/0.14.0/tui/layout/enum.Constraint.html#variant.Min)
+    /// in simple layouts. It is only recommended to use this constraint in cases where all subsequent constraints are [`Length`](`Self::Length`)'s.
+    MinLenRemaining(Length, RemainingLength),
 }
 
 /// An evenly split layout.
@@ -277,4 +361,14 @@ impl RectExt for Rect {
             height: dimensions.height,
         }
     }
+}
+
+/// Calculate a rounded percentage `pcnt` of the given `value` without floating point math for the best performance.
+fn fast_rounded_percentage(value: u16, pcnt: u16) -> u16 {
+    let mult = value * pcnt;
+    let decimal = mult / 10;
+    let round_remainder = (decimal % 10 >= 5) as u16;
+    let result = decimal / 10;
+
+    result + round_remainder
 }
