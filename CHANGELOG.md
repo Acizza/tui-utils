@@ -1,6 +1,6 @@
 # Changelog
 
-## To Be Released
+## 0.8.0 - March 10th, 2021
 
 ### Features
 
