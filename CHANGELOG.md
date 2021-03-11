@@ -6,6 +6,10 @@
 
 * Added new `SimpleTable` widget. On (very) naive benchmarks, it's roughly ~10x faster than [tui::widgets::Table](https://docs.rs/tui/0.14.0/tui/widgets/struct.Table.html).
 
+### Breaking Changes
+
+* The `simple_*` prefix has been removed from all widget module names. Ex: `simple_text` is now `text`, and `simple_list` is now `list`.
+
 ## 0.8.0 - March 10th, 2021
 
 ### Features
