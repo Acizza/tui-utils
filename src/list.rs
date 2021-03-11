@@ -42,6 +42,16 @@ impl WrappingIndex {
             self.0 - 1
         }
     }
+
+    /// Ensure the index is within the given `max` value.
+    ///
+    /// If the index is out of bounds, it will be set to one less than the given `max`.
+    #[inline]
+    pub fn update_bounds(&mut self, max: usize) {
+        if self.0 >= max {
+            self.0 = max.saturating_sub(1);
+        }
+    }
 }
 
 impl PartialEq<usize> for WrappingIndex {
@@ -67,6 +77,12 @@ impl<T> IndexMut<WrappingIndex> for Vec<T> {
 impl Into<usize> for WrappingIndex {
     fn into(self) -> usize {
         self.0
+    }
+}
+
+impl Default for WrappingIndex {
+    fn default() -> Self {
+        Self::new(0)
     }
 }
 
@@ -152,9 +168,7 @@ where
     /// This should be called whenever an item is removed.
     #[inline]
     pub fn update_bounds(&mut self) {
-        if self.index.get() >= self.items.num_items() {
-            *self.index.get_mut() = self.items.num_items().saturating_sub(1);
-        }
+        self.index.update_bounds(self.items.num_items())
     }
 
     /// Returns a mutable reference to the contained items.

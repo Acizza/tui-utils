@@ -1,12 +1,15 @@
 pub mod list;
 pub mod log;
+pub mod table;
 pub mod text;
 pub mod text_fragments;
 
 pub use list::SimpleList;
 pub use log::Log;
+pub use table::SimpleTable;
 pub use text::SimpleText;
 pub use text_fragments::TextFragments;
+
 use tui::{style::Style, text::Span};
 
 #[derive(Debug, Clone)]

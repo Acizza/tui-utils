@@ -1,5 +1,11 @@
 # Changelog
 
+## To Be Released
+
+### Features
+
+* Added new `SimpleTable` widget. On (very) naive benchmarks, it's roughly ~10x faster than [tui::widgets::Table](https://docs.rs/tui/0.14.0/tui/widgets/struct.Table.html).
+
 ## 0.8.0 - March 10th, 2021
 
 ### Features
