@@ -76,11 +76,10 @@ where
 
         let layout = SimpleLayout::new(Direction::Horizontal).split(area, self.layout);
 
-        let offset_x = if let Some((_, width)) = &self.highlight_symbol {
-            *width
-        } else {
-            0
-        };
+        let offset_x = self
+            .highlight_symbol
+            .as_ref()
+            .map_or(0, |(_, width)| *width);
 
         let header_offset = if let Some(columns) = self.header {
             if layout.len() != columns.len() {
