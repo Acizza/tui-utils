@@ -12,6 +12,7 @@ use tui::{
     layout::{Alignment, Rect},
 };
 
+pub mod helpers;
 pub mod layout;
 pub mod list;
 pub mod widgets;
