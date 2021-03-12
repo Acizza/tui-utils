@@ -13,6 +13,10 @@ pub fn by_letters<'a, I>(fragments: I, area_width: u16) -> SmallVec<[Fragment<'a
 where
     I: IntoIterator<Item = Fragment<'a>>,
 {
+    if area_width == 0 {
+        return SmallVec::new();
+    }
+
     let fragments = fragments.into_iter();
 
     let mut results = if let (_, Some(max)) = fragments.size_hint() {
@@ -161,8 +165,95 @@ fn wrap_span_newlines(span: Span, opts: SpanOptions) -> SmallVec<[Fragment; 4]> 
 
 #[cfg(test)]
 mod tests {
-    use super::by_newlines;
+    use super::{by_letters, by_newlines};
     use crate::widgets::Fragment;
+
+    #[test]
+    fn by_letters_empty() {
+        let fragments = [];
+        let result = by_letters(fragments.iter().cloned(), 10);
+
+        assert_eq!(result.as_slice(), []);
+    }
+
+    #[test]
+    fn by_letters_no_wrapping() {
+        let fragments = [Fragment::span("this is a test")];
+        let result = by_letters(fragments.iter().cloned(), 20);
+
+        assert_eq!(result.as_slice(), fragments);
+    }
+
+    #[test]
+    fn by_letters_no_space() {
+        let fragments = [Fragment::span("this is a test")];
+        let result = by_letters(fragments.iter().cloned(), 0);
+
+        assert_eq!(result.as_slice(), []);
+    }
+
+    #[test]
+    fn by_letters_limited_space() {
+        let fragments = [Fragment::span("test")];
+        let result = by_letters(fragments.iter().cloned(), 1);
+
+        assert_eq!(
+            result.as_slice(),
+            [
+                Fragment::span("t"),
+                Fragment::Line,
+                Fragment::span("e"),
+                Fragment::Line,
+                Fragment::span("s"),
+                Fragment::Line,
+                Fragment::span("t")
+            ]
+        );
+    }
+
+    #[test]
+    fn by_letters_wrap_once() {
+        let fragments = [Fragment::span("this is a test")];
+        let result = by_letters(fragments.iter().cloned(), 10);
+
+        assert_eq!(
+            result.as_slice(),
+            [
+                Fragment::span("this is a "),
+                Fragment::Line,
+                Fragment::span("test")
+            ]
+        );
+    }
+
+    #[test]
+    fn by_letters_wrap_multiple_times() {
+        let fragments = [Fragment::span("this is a test of wrapping long sentences")];
+        let result = by_letters(fragments.iter().cloned(), 10);
+
+        assert_eq!(
+            result.as_slice(),
+            [
+                Fragment::span("this is a "),
+                Fragment::Line,
+                Fragment::span("test of wr"),
+                Fragment::Line,
+                Fragment::span("apping lon"),
+                Fragment::Line,
+                Fragment::span("g sentence"),
+                Fragment::Line,
+                Fragment::span("s")
+            ]
+        );
+    }
+
+    #[test]
+    fn by_letters_no_wrap_at_edge() {
+        let fragments = [Fragment::span("this is a test")];
+        let result = by_letters(fragments.iter().cloned(), "this is a test".len() as u16);
+
+        assert_eq!(result.as_slice(), fragments);
+    }
 
     #[test]
     fn newlines_empty() {
