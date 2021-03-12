@@ -4,6 +4,8 @@
 
 ### Features
 
+* Added `wrap::by_newlines` function to wrap `Fragment`'s by newline (`\n`) characters.
+
 * Implemented `PartialEq` for `Fragment` enum.
 
 ### Fixes
