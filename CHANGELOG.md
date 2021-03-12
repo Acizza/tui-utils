@@ -1,5 +1,11 @@
 # Changelog
 
+## To Be Released
+
+### Fixes
+
+* Fixed line length not being reset when encountering `Fragment::Line` in `wrap::by_letters`.
+
 ## 0.9.0 - March 11th, 2021
 
 ### Features

@@ -22,9 +22,13 @@ where
                 let wrapped = wrap_span_letters(&span, opts, area_width, &mut line_length);
                 results.extend(wrapped.into_iter());
             }
+            Fragment::Line => {
+                line_length = 0;
+                results.push(fragment);
+            }
             fragment => {
                 line_length += fragment.len();
-                results.push(fragment)
+                results.push(fragment);
             }
         }
     }
