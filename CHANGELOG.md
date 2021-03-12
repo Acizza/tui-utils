@@ -2,6 +2,10 @@
 
 ## To Be Released
 
+### Features
+
+* Implemented `PartialEq` for `Fragment` enum.
+
 ### Fixes
 
 * Fixed line length not being reset when encountering `Fragment::Line` in `wrap::by_letters`.

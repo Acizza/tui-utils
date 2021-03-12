@@ -83,6 +83,17 @@ impl<'a> Fragment<'a> {
     }
 }
 
+impl<'a> PartialEq for Fragment<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Span(fst, _), Self::Span(snd, _)) => fst.content == snd.content,
+            (Self::Char(fst, _), Self::Char(snd, _)) => fst == snd,
+            (Self::Line, Self::Line) => true,
+            _ => false,
+        }
+    }
+}
+
 /// Options for a particular span of text.
 #[derive(Debug, Clone, Copy)]
 pub struct SpanOptions {
