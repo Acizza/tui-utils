@@ -13,13 +13,20 @@ pub fn by_letters<'a, I>(fragments: I, area_width: u16) -> SmallVec<[Fragment<'a
 where
     I: IntoIterator<Item = Fragment<'a>>,
 {
-    let mut results = SmallVec::new();
+    let fragments = fragments.into_iter();
+
+    let mut results = if let (_, Some(max)) = fragments.size_hint() {
+        SmallVec::with_capacity(max)
+    } else {
+        SmallVec::new()
+    };
+
     let mut line_length = 0;
 
     for fragment in fragments {
         match fragment {
             Fragment::Span(span, opts) => {
-                let wrapped = wrap_span_letters(&span, opts, area_width, &mut line_length);
+                let wrapped = wrap_span_letters(span, opts, area_width, &mut line_length);
                 results.extend(wrapped.into_iter());
             }
             Fragment::Line => {
@@ -37,7 +44,7 @@ where
 }
 
 fn wrap_span_letters<'a>(
-    span: &Span<'a>,
+    span: Span<'a>,
     opts: SpanOptions,
     area_width: u16,
     line_length: &mut u16,
@@ -65,16 +72,19 @@ fn wrap_span_letters<'a>(
         *line_length = ch_width;
     }
 
-    let segment = span.content[segment_start..].to_owned();
+    // If our start position hasn't moved, then we never had to wrap anything
+    let segment = if segment_start == 0 {
+        span
+    } else {
+        let content = span.content[segment_start..].to_owned();
 
-    // The grapheme loop already increases the line length, so to avoid counting it twice
-    // we should only increase it here if a line break was inserted (aka our start position moved)
-    if segment_start > 0 {
-        *line_length += segment.width() as u16;
-    }
+        // The grapheme loop already increases the line length, so to avoid counting it twice
+        // we should only increase it here if a line break was inserted (aka our start position moved)
+        *line_length += content.width() as u16;
 
-    let segment_span = Span::styled(segment, span.style);
-    results.push(Fragment::Span(segment_span, opts));
+        Span::styled(content, span.style)
+    };
 
+    results.push(Fragment::Span(segment, opts));
     results
 }

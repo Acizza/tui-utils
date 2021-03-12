@@ -6,6 +6,8 @@
 
 * Fixed line length not being reset when encountering `Fragment::Line` in `wrap::by_letters`.
 
+* Reduced potential number of allocations in `wrap::by_letters` when no wrapping has to be done.
+
 ## 0.9.0 - March 11th, 2021
 
 ### Features
