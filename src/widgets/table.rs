@@ -10,28 +10,26 @@ use unicode_width::UnicodeWidthStr;
 type Width = u16;
 
 /// A table widget similar to [`tui::widget::Table`](https://docs.rs/tui/0.14.0/tui/widgets/struct.Table.html).
-pub struct SimpleTable<'a, I, Ref>
+pub struct SimpleTable<'a, I, Ref, const N: usize>
 where
     I: IntoIterator<Item = Ref>,
     Ref: AsRef<[Span<'a>]>,
 {
     data: I,
-    layout: &'a [BasicConstraint],
+    layout: [BasicConstraint; N],
     header: Option<&'a [Span<'a>]>,
     selected: Option<u16>,
     highlight_symbol: Option<(Span<'a>, Width)>,
 }
 
-impl<'a, I, Ref> SimpleTable<'a, I, Ref>
+impl<'a, I, Ref, const N: usize> SimpleTable<'a, I, Ref, N>
 where
     I: IntoIterator<Item = Ref>,
     Ref: AsRef<[Span<'a>]>,
 {
-    /// Returns a new [`SimpleTable`].
-    ///
-    /// This widget will allocate during rendering if more than 4 columns are needed.
+    /// Returns a new [`SimpleTable`] with the given `data` and column `layout`.
     #[inline]
-    pub fn new(data: I, layout: &'a [BasicConstraint]) -> Self {
+    pub fn new(data: I, layout: [BasicConstraint; N]) -> Self {
         Self {
             data,
             layout,
@@ -64,7 +62,7 @@ where
     }
 }
 
-impl<'a, I, Ref> Widget for SimpleTable<'a, I, Ref>
+impl<'a, I, Ref, const N: usize> Widget for SimpleTable<'a, I, Ref, N>
 where
     I: IntoIterator<Item = Ref>,
     Ref: AsRef<[Span<'a>]>,
@@ -160,8 +158,8 @@ mod tests {
     use crate::layout::BasicConstraint;
     use tui::{backend::TestBackend, buffer::Buffer, layout::Rect, text::Span, Terminal};
 
-    fn test_table<'a, I, Ref>(
-        table: SimpleTable<'a, I, Ref>,
+    fn test_table<'a, I, Ref, const N: usize>(
+        table: SimpleTable<'a, I, Ref, N>,
         width: u16,
         height: u16,
         expected: Buffer,
@@ -184,14 +182,14 @@ mod tests {
         data: I,
         header: &'a [Span<'a>],
         select: u16,
-    ) -> SimpleTable<'a, I, Ref>
+    ) -> SimpleTable<'a, I, Ref, 2>
     where
         I: IntoIterator<Item = Ref>,
         Ref: AsRef<[Span<'a>]>,
     {
         SimpleTable::new(
             data,
-            &[BasicConstraint::Length(12), BasicConstraint::Length(13)],
+            [BasicConstraint::Length(12), BasicConstraint::Length(13)],
         )
         .header(header)
         .highlight_symbol(Span::raw(">"))
@@ -243,7 +241,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(5), BasicConstraint::Length(5)],
+            [BasicConstraint::Length(5), BasicConstraint::Length(5)],
         );
 
         let expected = {
@@ -268,7 +266,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(5), BasicConstraint::Length(5)],
+            [BasicConstraint::Length(5), BasicConstraint::Length(5)],
         );
 
         let expected = Buffer::with_lines(vec!["Left Right"]);
@@ -282,7 +280,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(6), BasicConstraint::Length(6)],
+            [BasicConstraint::Length(6), BasicConstraint::Length(6)],
         );
 
         let expected = Buffer::with_lines(vec![
@@ -303,7 +301,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[
+            [
                 BasicConstraint::Percentage(50),
                 BasicConstraint::Percentage(50),
             ],
@@ -455,7 +453,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(12), BasicConstraint::Length(13)],
+            [BasicConstraint::Length(12), BasicConstraint::Length(13)],
         )
         .header(&header)
         .highlight_symbol(Span::raw(">"))
@@ -480,7 +478,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(12), BasicConstraint::Length(13)],
+            [BasicConstraint::Length(12), BasicConstraint::Length(13)],
         )
         .header(&header)
         .highlight_symbol(Span::raw(">"))
@@ -505,7 +503,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(12), BasicConstraint::Length(13)],
+            [BasicConstraint::Length(12), BasicConstraint::Length(13)],
         )
         .header(&header)
         .highlight_symbol(Span::raw(">"))
@@ -523,7 +521,7 @@ mod tests {
 
         let table = SimpleTable::new(
             &data,
-            &[BasicConstraint::Length(12), BasicConstraint::Length(13)],
+            [BasicConstraint::Length(12), BasicConstraint::Length(13)],
         )
         .header(&header)
         .highlight_symbol(Span::raw(">"))

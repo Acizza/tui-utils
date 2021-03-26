@@ -1,4 +1,3 @@
-use smallvec::SmallVec;
 use tui::layout::{Direction, Rect};
 
 /// Build simple layouts much faster than [`tui::layout::Layout`](https://docs.rs/tui/0.14.0/tui/layout/struct.Layout.html) and without ever allocating.
@@ -126,14 +125,14 @@ impl SimpleLayout {
     /// This is a fast alternative to [`tui::layout::Layout::split`](https://docs.rs/tui/0.14.0/tui/layout/struct.Layout.html#method.split).
     #[inline]
     #[must_use]
-    pub fn split(self, area: Rect, constraints: &[BasicConstraint]) -> SmallVec<[Rect; 4]> {
+    pub fn split<const N: usize>(self, area: Rect, constraints: [BasicConstraint; N]) -> [Rect; N] {
         let area = self.get_padded(area);
         let gen_rect = GenericRect::from_dir(&self.direction, area);
 
-        let mut results = SmallVec::with_capacity(constraints.len());
+        let mut results = [Rect::default(); N];
         let mut offset = 0;
 
-        for &constraint in constraints {
+        for (i, &constraint) in constraints.iter().enumerate() {
             let size = match constraint {
                 BasicConstraint::Length(len) => len,
                 BasicConstraint::Percentage(pcnt) => fast_rounded_percentage(gen_rect.size, pcnt),
@@ -149,7 +148,7 @@ impl SimpleLayout {
             let max_size = size.min(gen_rect.size - offset);
 
             let rect = GenericRect::new(gen_rect.pos + offset, max_size);
-            results.push(rect.as_rect(&self.direction, area));
+            results[i] = rect.as_rect(&self.direction, area);
 
             offset += max_size;
         }

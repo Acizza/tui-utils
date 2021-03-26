@@ -1,5 +1,11 @@
 # Changelog
 
+## To Be Released
+
+### Breaking Changes
+
+* Constraints in `Layout::split` and the `SimpleTable` widget are now taken by value via const generics. This means that having more than 4 constraints will no longer allocate.
+
 ## 0.10.0 - March 21st, 2021
 
 ### Features
