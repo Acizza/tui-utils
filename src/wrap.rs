@@ -167,11 +167,12 @@ fn wrap_span_newlines(span: Span, opts: SpanOptions) -> SmallVec<[Fragment; 4]> 
 mod tests {
     use super::{by_letters, by_newlines};
     use crate::widgets::Fragment;
+    use std::array::IntoIter;
 
     #[test]
     fn by_letters_empty() {
         let fragments = [];
-        let result = by_letters(fragments.iter().cloned(), 10);
+        let result = by_letters(IntoIter::new(fragments), 10);
 
         assert_eq!(result.as_slice(), []);
     }
@@ -187,7 +188,7 @@ mod tests {
     #[test]
     fn by_letters_no_space() {
         let fragments = [Fragment::span("this is a test")];
-        let result = by_letters(fragments.iter().cloned(), 0);
+        let result = by_letters(IntoIter::new(fragments), 0);
 
         assert_eq!(result.as_slice(), []);
     }
@@ -195,7 +196,7 @@ mod tests {
     #[test]
     fn by_letters_limited_space() {
         let fragments = [Fragment::span("test")];
-        let result = by_letters(fragments.iter().cloned(), 1);
+        let result = by_letters(IntoIter::new(fragments), 1);
 
         assert_eq!(
             result.as_slice(),
@@ -214,7 +215,7 @@ mod tests {
     #[test]
     fn by_letters_wrap_once() {
         let fragments = [Fragment::span("this is a test")];
-        let result = by_letters(fragments.iter().cloned(), 10);
+        let result = by_letters(IntoIter::new(fragments), 10);
 
         assert_eq!(
             result.as_slice(),
@@ -229,7 +230,7 @@ mod tests {
     #[test]
     fn by_letters_wrap_multiple_times() {
         let fragments = [Fragment::span("this is a test of wrapping long sentences")];
-        let result = by_letters(fragments.iter().cloned(), 10);
+        let result = by_letters(IntoIter::new(fragments), 10);
 
         assert_eq!(
             result.as_slice(),
@@ -258,7 +259,7 @@ mod tests {
     #[test]
     fn newlines_empty() {
         let fragments = [];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(result.as_slice(), []);
     }
@@ -274,7 +275,7 @@ mod tests {
     #[test]
     fn newlines_wrap_once() {
         let fragments = [Fragment::span("this is a simple\nwrapping test")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(
             result.as_slice(),
@@ -289,7 +290,7 @@ mod tests {
     #[test]
     fn newlines_wrap_three_times() {
         let fragments = [Fragment::span("this is\na simple\nwrapping\ntest")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(
             result.as_slice(),
@@ -308,7 +309,7 @@ mod tests {
     #[test]
     fn newlines_multiple_wraps_at_a_time() {
         let fragments = [Fragment::span("this is a\n\n\nwrapping test")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(
             result.as_slice(),
@@ -325,7 +326,7 @@ mod tests {
     #[test]
     fn newlines_only_wraps() {
         let fragments = [Fragment::span("\n\n\n")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(
             result.as_slice(),
@@ -336,7 +337,7 @@ mod tests {
     #[test]
     fn newlines_only_wraps_once() {
         let fragments = [Fragment::span("\n")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(result.as_slice(), [Fragment::Line]);
     }
@@ -344,7 +345,7 @@ mod tests {
     #[test]
     fn newlines_starts_with_wrap_ends_with_wrap() {
         let fragments = [Fragment::span("\nThis is a test!\n")];
-        let result = by_newlines(fragments.iter().cloned());
+        let result = by_newlines(IntoIter::new(fragments));
 
         assert_eq!(
             result.as_slice(),
