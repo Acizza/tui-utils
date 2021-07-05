@@ -2,9 +2,13 @@
 
 ## To Be Released
 
+## 0.11.0 - July 5th, 2021
+
 ### Breaking Changes
 
 * Constraints in `Layout::split` and the `SimpleTable` widget are now taken by value via const generics. This means that having more than 4 constraints will no longer allocate.
+
+* The `tui` library has been bumped to `0.15`.
 
 ## 0.10.0 - March 21st, 2021
 

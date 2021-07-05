@@ -1,6 +1,6 @@
 [package]
 name = "tui-utils"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Acizza <jgit@tuta.io>"]
 edition = "2018"
 
